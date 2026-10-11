@@ -33,19 +33,20 @@ export class TradesService {
     const now = new Date();
 
     const periods = {
-      '1m': 60 * 1000,
-      '3m': 3 * 60 * 1000,
-      '5m': 5 * 60 * 1000,
-      '15m': 15 * 60 * 1000,
-      '1h': 60 * 60 * 1000,
-      '3h': 3 * 60 * 60 * 1000,
-      '6h': 6 * 60 * 60 * 1000,
-      '12h': 12 * 60 * 60 * 1000,
-      '24h': 24 * 60 * 60 * 1000,
-    };
+  '1m': 60 * 1000,
+  '3m': 3 * 60 * 1000,
+  '5m': 5 * 60 * 1000,
+  '15m': 15 * 60 * 1000,
+  '1h': 60 * 60 * 1000,
+  '3h': 3 * 60 * 60 * 1000,
+  '6h': 6 * 60 * 60 * 1000,
+  '12h': 12 * 60 * 60 * 1000,
+  '1d': 24 * 60 * 60 * 1000,
+  '7d': 7 * 24 * 60 * 60 * 1000,
+};
 
     const oldestCutoff = new Date(
-      now.getTime() - periods['24h'],
+      now.getTime() - periods['7d'],
     );
 
     const trades = await this.tradeModel
@@ -135,21 +136,21 @@ export class TradesService {
   }
 
   @Cron('*/10 * * * *')
-  async cleanupOldTrades(): Promise<void> {
-    const cutoff = new Date(
-      Date.now() - 24 * 60 * 60 * 1000,
+async cleanupOldTrades(): Promise<void> {
+  const cutoff = new Date(
+    Date.now() - 7 * 24 * 60 * 60 * 1000,
+  );
+
+  const result = await this.tradeModel.deleteMany({
+    tradeTime: {
+      $lt: cutoff,
+    },
+  });
+
+  if (result.deletedCount > 0) {
+    console.log(
+      `🗑️ Cleanup: deleted ${result.deletedCount} trades older than 7 days`,
     );
-
-    const result = await this.tradeModel.deleteMany({
-      tradeTime: {
-        $lt: cutoff,
-      },
-    });
-
-    if (result.deletedCount > 0) {
-      console.log(
-        `🗑️ Cleanup: deleted ${result.deletedCount} trades older than 24 hours`,
-      );
-    }
   }
+}
 }

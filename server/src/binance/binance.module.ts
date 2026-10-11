@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-
 import { BinanceController } from './binance.controller';
-import { BinanceService } from './binance.service';
+import { BinanceWssService } from './binance-wss.service';
+import { MarketDataModule } from '../market-data/market-data.module';
 import { TradesModule } from '../trades/trades.module';
 
 @Module({
-  imports: [TradesModule],
-  controllers: [BinanceController],
-  providers: [BinanceService],
+imports: [MarketDataModule, TradesModule],
+controllers: [BinanceController],
+providers: [BinanceWssService],
 })
 export class BinanceModule {}

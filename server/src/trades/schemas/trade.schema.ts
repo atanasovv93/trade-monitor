@@ -67,3 +67,8 @@ export class Trade {
 }
 
 export const TradeSchema = SchemaFactory.createForClass(Trade);
+
+TradeSchema.index(
+  { symbol: 1, tradeId: 1 },
+  { unique: true },
+);

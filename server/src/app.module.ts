@@ -8,27 +8,27 @@ import { BinanceModule } from './binance/binance.module';
 import { TradesModule } from './trades/trades.module';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
+imports: [
+ConfigModule.forRoot({
+isGlobal: true,
+}),
 
-    ScheduleModule.forRoot(),
+ScheduleModule.forRoot(),
 
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGODB_URI'),
-      }),
-    }),
+MongooseModule.forRootAsync({
+  imports: [ConfigModule],
+  inject: [ConfigService],
+  useFactory: (configService: ConfigService) => ({
+    uri: configService.get<string>('MONGODB_URI'),
+  }),
+}),
 
-    BinanceModule,
+BinanceModule,
+TradesModule,
 
-    TradesModule,
-  ],
+],
 
-  controllers: [AppController],
-  providers: [AppService],
+controllers: [AppController],
+providers: [AppService],
 })
 export class AppModule {}
