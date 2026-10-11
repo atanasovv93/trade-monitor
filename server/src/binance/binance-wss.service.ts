@@ -14,6 +14,7 @@ MarketStreamType,
 BinanceCombinedMessage,
 } from '../market-data/types/market-data.types';
 
+import { CandlesService } from '../candles/candles.service';
 import { TradesService } from '../trades/trades.service';
 import { TradeInterface } from '../trades/interfaces/trade.interface';
 
@@ -39,6 +40,7 @@ constructor(
 private readonly configService: ConfigService,
 private readonly marketDataService: MarketDataService,
 private readonly tradesService: TradesService,
+private readonly candlesService: CandlesService,
 ) {}
 
 getSymbols(): string[] {
@@ -97,6 +99,7 @@ const streams = symbols.flatMap((symbol) => {
   return [
     `${s}@ticker`,
     `${s}@kline_1m`,
+    `${s}@kline_1h`,
     `${s}@trade`,
     `${s}@bookTicker`,
   ];
@@ -188,6 +191,10 @@ switch (streamName) {
     type = 'kline';
     break;
 
+  case 'kline_1h':
+    type = 'kline_1h';
+    break;
+
   case 'trade':
     type = 'trade';
     break;
@@ -210,7 +217,7 @@ const event: MarketDataEvent = {
 // Objavi go nastanot za RAM cache i Socket.IO.
 this.marketDataService.publish(event);
 
-// Individualnite trades se zapisuvat vo MongoDB.
+// Zapisuvaj individualni trades vo MongoDB.
 if (type === 'trade') {
   try {
     const data = message.data;
@@ -261,6 +268,88 @@ if (type === 'trade') {
   }
 }
 
+  // Zapisuvaj samo zavrsheni 1m candles vo MongoDB.
+  if (type === 'kline') {
+    try {
+      await this.saveMinuteCandle(message.data);
+    } catch (error) {
+      const details =
+        error instanceof Error ? error.message : String(error);
+
+      this.logger.error(
+        `Failed to save 1m candle for ${streamSymbol.toUpperCase()}: ${details}`,
+      );
+    }
+  }
+
+// Zapisuvaj samo zavrsheni 1h candles vo MongoDB.
+if (type === 'kline_1h') {
+  try {
+    await this.saveHourlyCandle(message.data);
+  } catch (error) {
+    const details =
+      error instanceof Error ? error.message : String(error);
+
+    this.logger.error(
+      `Failed to save hourly candle for ${streamSymbol.toUpperCase()}: ${details}`,
+    );
+  }
+}
+
+}
+
+private async saveHourlyCandle(
+data: Record<string, any>,
+): Promise<void> {
+const kline = data['k'];
+
+this.logger.log(
+  `1h candle received: ${String(kline?.s)}, closed: ${String(kline?.x)}`,
+);
+
+if (!kline) {
+  return;
+}
+
+const openTime = Number(kline['t']);
+const closeTime = Number(kline['T']);
+const open = Number(kline['o']);
+const high = Number(kline['h']);
+const low = Number(kline['l']);
+const close = Number(kline['c']);
+const volume = Number(kline['v']);
+const quoteVolume = Number(kline['q']);
+const numberOfTrades = Number(kline['n']);
+
+if (
+  !Number.isFinite(openTime) ||
+  !Number.isFinite(closeTime) ||
+  !Number.isFinite(open) ||
+  !Number.isFinite(high) ||
+  !Number.isFinite(low) ||
+  !Number.isFinite(close) ||
+  !Number.isFinite(volume) ||
+  !Number.isFinite(quoteVolume) ||
+  !Number.isSafeInteger(numberOfTrades)
+) {
+  this.logger.warn('Skipping invalid hourly candle');
+  return;
+}
+
+await this.candlesService.saveCandle({
+  symbol: String(kline['s']).toUpperCase(),
+  interval: '1h',
+  openTime: new Date(openTime),
+  closeTime: new Date(closeTime),
+  open,
+  high,
+  low,
+  close,
+  volume,
+  quoteVolume,
+  numberOfTrades,
+});
+
 }
 
 private scheduleReconnect(): void {
@@ -285,4 +374,56 @@ this.reconnectTimer = setTimeout(() => {
 }, delay);
 
 }
+
+
+private async saveMinuteCandle(
+  data: Record<string, any>,
+): Promise<void> {
+  const kline = data['k'];
+
+  // Zapisuvaj samo zatvoreni 1m candles.
+  if (!kline || kline['x'] !== true) {
+    return;
+  }
+
+  const openTime = Number(kline['t']);
+  const closeTime = Number(kline['T']);
+  const open = Number(kline['o']);
+  const high = Number(kline['h']);
+  const low = Number(kline['l']);
+  const close = Number(kline['c']);
+  const volume = Number(kline['v']);
+  const quoteVolume = Number(kline['q']);
+  const numberOfTrades = Number(kline['n']);
+
+  if (
+    !Number.isFinite(openTime) ||
+    !Number.isFinite(closeTime) ||
+    !Number.isFinite(open) ||
+    !Number.isFinite(high) ||
+    !Number.isFinite(low) ||
+    !Number.isFinite(close) ||
+    !Number.isFinite(volume) ||
+    !Number.isFinite(quoteVolume) ||
+    !Number.isSafeInteger(numberOfTrades)
+  ) {
+    this.logger.warn('Skipping invalid 1m candle');
+    return;
+  }
+
+  await this.candlesService.saveCandle({
+    symbol: String(kline['s']).toUpperCase(),
+    interval: '1m',
+    openTime: new Date(openTime),
+    closeTime: new Date(closeTime),
+    open,
+    high,
+    low,
+    close,
+    volume,
+    quoteVolume,
+    numberOfTrades,
+  });
+}
+
 }

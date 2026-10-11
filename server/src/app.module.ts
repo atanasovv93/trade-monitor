@@ -6,6 +6,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BinanceModule } from './binance/binance.module';
 import { TradesModule } from './trades/trades.module';
+import { CandlesModule } from './candles/candles.module';
+
 
 @Module({
 imports: [
@@ -25,7 +27,7 @@ MongooseModule.forRootAsync({
 
 BinanceModule,
 TradesModule,
-
+CandlesModule,
 ],
 
 controllers: [AppController],

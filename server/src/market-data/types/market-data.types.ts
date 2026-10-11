@@ -2,6 +2,7 @@
 export type MarketStreamType =
   | 'ticker'
   | 'kline'
+  | 'kline_1h'
   | 'trade'
   | 'bookTicker';
 
