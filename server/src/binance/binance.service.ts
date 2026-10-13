@@ -1,9 +1,9 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import WebSocket from 'ws';
 
-import { TradesService } from '../trades/trades.service';
-import { BinanceTradeEvent } from '../trades/interfaces/binance-trade.interface';
-import { TradeInterface } from '../trades/interfaces/trade.interface';
+import { TradesService } from './trades/trades.service';
+import { BinanceTradeEvent } from './trades/interfaces/binance-trade.interface';
+import { TradeInterface } from './trades/interfaces/trade.interface';
 
 @Injectable()
 export class BinanceService implements OnModuleInit {

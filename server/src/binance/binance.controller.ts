@@ -1,9 +1,9 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { BinanceWssService } from './binance-wss.service';
-import { MarketDataService } from '../market-data/market-data.service';
-import * as marketDataTypes from '../market-data/types/market-data.types';
+import { MarketDataService } from './market-data/market-data.service';
+import * as marketDataTypes from './market-data/types/market-data.types';
 
-@Controller('api/trades')
+@Controller('trades')
 export class BinanceController {
 constructor(
 private readonly binanceWssService: BinanceWssService,

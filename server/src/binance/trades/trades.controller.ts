@@ -2,7 +2,7 @@ import { Controller, Get, Param } from '@nestjs/common';
 
 import { TradesService } from './trades.service';
 
-@Controller('api/trades')
+@Controller('trades')
 export class TradesController {
   constructor(private readonly tradesService: TradesService) {}
 

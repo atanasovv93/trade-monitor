@@ -7,16 +7,16 @@ OnModuleInit,
 import WebSocket from 'ws';
 import { ConfigService } from '@nestjs/config';
 
-import { MarketDataService } from '../market-data/market-data.service';
+import { MarketDataService } from './market-data/market-data.service';
 import {
 MarketDataEvent,
 MarketStreamType,
 BinanceCombinedMessage,
-} from '../market-data/types/market-data.types';
+} from './market-data/types/market-data.types';
 
-import { CandlesService } from '../candles/candles.service';
-import { TradesService } from '../trades/trades.service';
-import { TradeInterface } from '../trades/interfaces/trade.interface';
+import { CandlesService } from './candles/candles.service';
+import { TradesService } from './trades/trades.service';
+import { TradeInterface } from './trades/interfaces/trade.interface';
 
 @Injectable()
 export class BinanceWssService
