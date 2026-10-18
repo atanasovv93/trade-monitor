@@ -72,3 +72,9 @@ TradeSchema.index(
   { symbol: 1, tradeId: 1 },
   { unique: true },
 );
+
+// Automatic deletion after 7 days
+TradeSchema.index(
+  { timestamp: 1 },
+  { expireAfterSeconds: 7 * 24 * 60 * 60 },
+);

@@ -303,13 +303,14 @@ data: Record<string, any>,
 ): Promise<void> {
 const kline = data['k'];
 
-this.logger.log(
-  `1h candle received: ${String(kline?.s)}, closed: ${String(kline?.x)}`,
-);
+// Zapisuvaj samo zatvoreni 1h candles.
+  if (!kline || kline['x'] !== true) {
+    return;
+  }
 
-if (!kline) {
-  return;
-}
+  this.logger.log(
+    `1h candle closed: ${String(kline['s'])}`,
+  );
 
 const openTime = Number(kline['t']);
 const closeTime = Number(kline['T']);

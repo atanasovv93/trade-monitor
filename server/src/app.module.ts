@@ -8,6 +8,8 @@ import { BinanceModule } from './binance/binance.module';
 import { TradesModule } from './binance/trades/trades.module';
 import { CandlesModule } from './binance/candles/candles.module';
 import { MetalsModule } from './metals/metals.module';
+import { AuthModule } from './auth/auth.module';
+
 
 @Module({
 imports: [
@@ -28,7 +30,8 @@ MongooseModule.forRootAsync({
 BinanceModule,
 TradesModule,
 CandlesModule,
-MetalsModule],
+MetalsModule,
+AuthModule],
 
 controllers: [AppController],
 providers: [AppService],

@@ -28,9 +28,6 @@ constructor(
   this.apiUrl =
     this.configService.get<string>('METALS_API_URL') ||
     'https://api.metals.dev/v1/latest';
-
-  this.logger.log(`Metals API URL: ${this.apiUrl}`);
-  this.logger.log(`Metals API key configured: ${Boolean(this.apiKey)}`);
 }
 
   async getLatest(): Promise<MetalDto[]> {
