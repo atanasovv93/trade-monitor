@@ -9,6 +9,7 @@ import { TradesModule } from './binance/trades/trades.module';
 import { CandlesModule } from './binance/candles/candles.module';
 import { MetalsModule } from './metals/metals.module';
 import { AuthModule } from './auth/auth.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 
 @Module({
@@ -31,7 +32,8 @@ BinanceModule,
 TradesModule,
 CandlesModule,
 MetalsModule,
-AuthModule],
+AuthModule,
+CloudinaryModule],
 
 controllers: [AppController],
 providers: [AppService],
